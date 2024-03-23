@@ -1,12 +1,20 @@
--- Create a temporary table to calculate the lifespan of each band
-CREATE TEMPORARY TABLE temp_band_lifespan AS
-SELECT band_name,
-       YEAR(MAX(split)) - YEAR(MIN(formed)) AS lifespan
-FROM metal_bands
-WHERE main_style = 'Glam rock'
-GROUP BY band_name;
+-- Calculate the lifespan of each band
+SELECT 
+    band_name, 
+    2022 - SUBSTRING_INDEX(lifespan, '-', 1) AS lifespan
+INTO 
+    bands_with_lifespan
+FROM 
+    metal_bands;
 
--- List all bands with Glam rock as their main style, ranked by their longevity
-SELECT band_name, lifespan
-FROM temp_band_lifespan
-ORDER BY lifespan DESC;
+-- Filter bands with the main style "Glam rock" and rank them by longevity
+SELECT 
+    band_name, 
+    RANK() OVER (ORDER BY 2022 - SUBSTRING_INDEX(lifespan, '-', 1) DESC) AS longevity_rank
+FROM 
+    bands_with_lifespan
+WHERE 
+    FIND_IN_SET('Glam rock', main_style) > 0
+ORDER BY 
+    longevity_rank;
+
