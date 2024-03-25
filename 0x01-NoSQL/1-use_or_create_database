@@ -1,19 +1,4 @@
-#!/usr/bin/env python3
-# MongoDB Command File
+#!/bin/bash
 
-"""
-This script connects to MongoDB and creates or uses the database my_db.
-"""
-
-import pymongo
-
-def main():
-    # Connect to MongoDB server
-    client = pymongo.MongoClient("mongodb://localhost:27017/")
-    
-    # Switch to the database my_db
-    db = client["my_db"]
-    print("Switched to database my_db")
-
-if __name__ == "__main__":
-    main()
+# Execute command to use or create the database my_db
+echo 'use my_db' | mongo
