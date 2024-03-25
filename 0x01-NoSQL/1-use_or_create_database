@@ -1,4 +1,3 @@
 #!/bin/bash
 
-# Execute command to use or create the database my_db
 echo 'use my_db' | mongo

@@ -1,3 +1,2 @@
-#!/bin/bash
-
-echo 'show databases' | mongo
+//Execute command to list databases
+show databases
