@@ -1,4 +1,2 @@
-// MongoDB Script for Inserting a Document
-
 // Insert a document into the collection 'school'
- db.school.insertOne({ name: "Holberton school" })
+ db.school.insert({ name: "Holberton school" })
