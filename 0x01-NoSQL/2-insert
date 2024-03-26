@@ -1,13 +1,8 @@
 // MongoDB Script for Inserting a Document
 
 // Connect to the specified database
-var db = new Mongo().getDB(databaseName);
+use my_db
 
 // Insert a document into the collection 'school'
-var result = db.school.insertOne({ name: "Holberton school" });
+ db.school.insertOne({ name: "Holberton school" });
 
-// Print the result
-printjson(result);
-
-// Exit the MongoDB shell
-quit();
