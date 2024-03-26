@@ -1,0 +1,2 @@
+// Match documents with name="Holberton school
+db.school.find({ "name": { "$regex": "^Holberton" } })
