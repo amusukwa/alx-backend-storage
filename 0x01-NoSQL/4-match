@@ -1,7 +1,2 @@
-// MongoDB Script for Listing All Documents with name="Holberton school" in the 'school' Collection
-
-// Connect to the specified database
-use my_db
-
 // Retrieve all documents from the 'school' collection with name="Holberton school"
 db.school.find({ name: "Holberton school" })
