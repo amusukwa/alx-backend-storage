@@ -1,7 +1,2 @@
-// MongoDB Script for Listing All Documents in the 'school' Collection
-
-// Connect to the specified database
-use my_db
-
 // Retrieve number of documents from the 'school' collection
 db.school.count()
