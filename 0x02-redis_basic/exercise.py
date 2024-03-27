@@ -7,6 +7,57 @@ This module defines a Cache class for storing data in Redis.
 import redis
 import uuid
 from typing import Union, Callable, Optional
+import functools
+
+
+def count_calls(method):
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        # Get the qualified name of the method
+        method_name = method.__qualname__
+
+        # Increment the call count for the method
+        self._redis.incr(method_name)
+
+        # Call the original method and return its result
+        return method(self, *args, **kwargs)
+
+    return wrapper
+
+
+def call_history(method: Callable) -> Callable:
+    """
+    Decorator to store the history of inputs and outputs
+
+    Args:
+        method: The original function to be decorated.
+
+    Returns:
+        Callable: The wrapped function with history logging.
+    """
+    @functools.wraps(method)
+    def wrapper(*args, **kwargs):
+        # Connect to Redis
+        r = redis.Redis()
+
+        # Create keys for input and output lists
+        input_key = method.__qualname__ + ":inputs"
+        output_key = method.__qualname__ + ":outputs"
+
+        # Append input arguments to the input list
+        r.rpush(input_key, str(args))
+
+        # Execute the original function and store its output
+        output = method(*args, **kwargs)
+
+        # Append the output to the output list
+        r.rpush(output_key, str(output))
+
+        # Return the output
+        return output
+
+    return wrapper
+
 
 class Cache:
     """
@@ -20,35 +71,41 @@ class Cache:
         """
         Initializes the Cache class.
 
-        Initializes instance of Redis client and flushes the Redis database.
+        Initializes an instance of Redis client and flushes the database
         """
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @count_calls
+    @call_history
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """
         Stores data in Redis and returns the generated key.
 
         Args:
-            data: The data to store in Redis. Can be a str, bytes, int, or float.
+            data: The data to store in Redis. Can be str, bytes, int, float.
 
         Returns:
             str: The key under which the data is stored in Redis.
         """
+
         key = str(uuid.uuid4())
+
         self._redis.set(key, data)
+
+        # Return the key
         return key
 
     def get(self, key: str, fn: Optional[Callable] = None) -> Union[str, bytes, int, float, None]:
         """
-        data from Redis using given key, applying optional conversion function.
+        Retrieves data from Redis using the given key
 
         Args:
             key: The key to retrieve data from Redis.
             fn: An optional conversion function to apply to the retrieved data.
 
         Returns:
-            Union[str, bytes, int, float, None]: The retrieved data
+            Union[str, bytes, int, float, None]: data.
         """
         data = self._redis.get(key)
         if data is None:
@@ -65,7 +122,7 @@ class Cache:
             key: The key to retrieve the string value from Redis.
 
         Returns:
-            Optional[str]: The retrieved string value, or None if the key does not exist.
+            Optional[str]: The retrieved string value, or None if no key.
         """
         return self.get(key, str.decode)
 
@@ -77,6 +134,6 @@ class Cache:
             key: The key to retrieve the integer value from Redis.
 
         Returns:
-            Optional[int]: The retrieved integer value, or None if the key does not exist or the value is not an integer.
-        """
+            Optional[int]: The retrieved integer value, or None if no key 
+      """
         return self.get(key, int)
