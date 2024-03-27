@@ -137,3 +137,25 @@ class Cache:
             Optional[int]: The retrieved integer value, or None if no key 
       """
         return self.get(key, int)
+
+    def replay(method: Callable) -> None:
+        """
+        Display the history of calls of a particular function.
+
+        Args:
+        method: The function to display the history for.
+        """
+        # Get the qualified name of the method
+        method_name = method.__qualname__
+
+        # Connect to Redis
+        r = redis.Redis()
+        input_key = method_name + ":inputs"
+        output_key = method_name + ":outputs"
+
+        inputs = r.lrange(input_key, 0, -1)
+        outputs = r.lrange(output_key, 0, -1)
+        print(f"{method_name} was called {len(inputs)} times:")
+        for input_data, output_data in zip(inputs, outputs):
+            input_str = ", ".join(eval(input_data.decode()))
+            print(f"{method_name}(*({input_str},)) -> {output_data.decode()}")
