@@ -12,7 +12,7 @@ import functools
 
 def count_calls(method):
     @functools.wraps(method)
-    def wrapper(self, *args, **kwargs):
+    def wrapper(self: object, *args: tuple, **kwargs: dict) -> str:
         # Get the qualified name of the method
         method_name = method.__qualname__
 
@@ -36,7 +36,7 @@ def call_history(method: Callable) -> Callable:
         Callable: The wrapped function with history logging.
     """
     @functools.wraps(method)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: tuple, **kwargs: dict) -> str:
         # Connect to Redis
         r = redis.Redis()
 
