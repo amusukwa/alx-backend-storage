@@ -44,7 +44,7 @@ def call_history(method: Callable) -> Callable:
         input_key = method.__qualname__ + ":inputs"
         output_key = method.__qualname__ + ":outputs"
 
-        # Append input arguments to the input list
+        # Append input arguments to the input list using rpush
         r.rpush(input_key, str(args))
 
         # Execute the original function and store its output
