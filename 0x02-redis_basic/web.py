@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+""" Module for get_page using redis cache"""
+
 import requests
 import redis
 import time
@@ -35,15 +37,4 @@ def get_page(url: str) -> str:
 
     return html_content
 
-# Test the get_page function
 if __name__ == "__main__":
-    # Simulate accessing a slow URL multiple times
-    url = "http://slowwly.robertomurray.co.uk/delay/5000/url/https://www.example.com"
-    for i in range(5):
-        print(f"Accessing {url}... (attempt {i + 1})")
-        start_time = time.time()
-        content = get_page(url)
-        print(f"Content length: {len(content)}")
-        end_time = time.time()
-        print(f"Time taken: {end_time - start_time:.2f} seconds")
-
